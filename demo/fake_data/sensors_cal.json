@@ -1,0 +1,16 @@
+{
+  "compass": {
+    "valid": true,
+    "coverage": 0.85,
+    "sample_count": 120,
+    "hard_iron": [0, 0, 0],
+    "soft_iron": [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+    "expires_at": "2027-12-31T23:59:59"
+  },
+  "accel": {
+    "valid": true
+  },
+  "gyro": {
+    "valid": true
+  }
+}
