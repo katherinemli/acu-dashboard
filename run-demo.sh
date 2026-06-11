@@ -30,9 +30,10 @@ else
     source venv/bin/activate
 fi
 export RUNTIME_DIR="$RUNTIME_DIR"
+export DEMO_DATA_DIR="$RUNTIME_DIR"
 python3 app.py &
 BACKEND_PID=$!
-echo "   Backend (PID $BACKEND_PID) → http://localhost:5000"
+echo "   Backend (PID $BACKEND_PID) → http://localhost:8000"
 sleep 2
 
 # 3. Frontend
@@ -49,7 +50,7 @@ echo "=================================="
 echo "✅ Ready!"
 echo ""
 echo "Open: http://localhost:5173"
-echo "Backend: http://localhost:5000/api/status"
+echo "Backend: http://localhost:8000/api/status"
 echo ""
 echo "Ctrl+C to stop (PIDs: $ACU_PID $BACKEND_PID $FRONTEND_PID)"
 echo ""

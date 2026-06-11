@@ -1,5 +1,7 @@
 # Python
 __pycache__/
+venv/
+backend/venv/
 *.py[cod]
 *$py.class
 *.so
@@ -67,3 +69,5 @@ instance/
 /var/log/*
 /var/lib/*
 state.json
+backend/map.mbtiles
+frontend/node_modules/
