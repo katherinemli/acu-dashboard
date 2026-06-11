@@ -111,18 +111,18 @@ cd frontend && npm install && npm run dev
 ```bash
 cd eureka-package
 ./make_deb.sh
-# Creates: eureka-acu_1.0.0_amd64.deb
+# Creates: acu_1.0.0_amd64.deb
 ```
 
 ### Install on Debian/Ubuntu
 ```bash
-sudo dpkg -i eureka-acu_1.0.0_amd64.deb
-sudo systemctl start eureka-daemon eureka-backend
+sudo dpkg -i acu_1.0.0_amd64.deb
+sudo systemctl start acu-daemon acu-backend
 ```
 
 **What the DEB provides:**
 - ✅ Systemd services (auto-start, logging, restart on failure)
-- ✅ Unprivileged `eureka` service user
+- ✅ Unprivileged `acu` service user
 - ✅ Secure systemd hardening (PrivateTmp, ProtectSystem, etc.)
 - ✅ Python venv auto-setup (postinst)
 - ✅ Log rotation integration

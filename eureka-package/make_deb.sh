@@ -1,16 +1,16 @@
 #!/bin/bash
-# Build Eureka ACU DEB package
+# Build ACU DEB package
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-BUILD_DIR="/tmp/eureka-deb-build"
-PACKAGE_NAME="eureka-acu"
+BUILD_DIR="/tmp/acu-deb-build"
+PACKAGE_NAME="acu"
 VERSION="1.0.0"
 DEB_NAME="${PACKAGE_NAME}_${VERSION}_amd64.deb"
 
-echo "Building Eureka ACU DEB package..."
+echo "Building ACU DEB package..."
 echo "=================================="
 echo "Project: $PROJECT_DIR"
 echo "Build dir: $BUILD_DIR"
@@ -36,14 +36,14 @@ mkdir -p "$INSTALL_ROOT/etc/systemd/system"
 cp "$SCRIPT_DIR/etc/systemd/system/"*.service "$INSTALL_ROOT/etc/systemd/system/"
 
 # Install application files
-mkdir -p "$INSTALL_ROOT/opt/eureka"
-cp -r "$PROJECT_DIR/acu-daemon" "$INSTALL_ROOT/opt/eureka/"
-cp -r "$PROJECT_DIR/backend" "$INSTALL_ROOT/opt/eureka/"
-cp -r "$PROJECT_DIR/frontend/dist" "$INSTALL_ROOT/opt/eureka/frontend" 2>/dev/null || echo "Note: frontend not built, skipping dist/"
+mkdir -p "$INSTALL_ROOT/opt/acu"
+cp -r "$PROJECT_DIR/acu-daemon" "$INSTALL_ROOT/opt/acu/"
+cp -r "$PROJECT_DIR/backend" "$INSTALL_ROOT/opt/acu/"
+cp -r "$PROJECT_DIR/frontend/dist" "$INSTALL_ROOT/opt/acu/frontend" 2>/dev/null || echo "Note: frontend not built, skipping dist/"
 
 # Create skeleton dirs
-mkdir -p "$INSTALL_ROOT/var/log/eureka"
-mkdir -p "$INSTALL_ROOT/var/lib/eureka"
+mkdir -p "$INSTALL_ROOT/var/log/acu"
+mkdir -p "$INSTALL_ROOT/var/lib/acu"
 
 # Build DEB package
 echo "Building package..."
@@ -62,9 +62,9 @@ echo "  sudo dpkg -i $DEB_NAME"
 echo "  sudo apt-get install -f  # (if deps missing)"
 echo ""
 echo "Start services:"
-echo "  sudo systemctl start eureka-daemon"
-echo "  sudo systemctl start eureka-backend"
+echo "  sudo systemctl start acu-daemon"
+echo "  sudo systemctl start acu-backend"
 echo ""
 echo "View logs:"
-echo "  sudo journalctl -u eureka-backend -f"
-echo "  sudo journalctl -u eureka-daemon -f"
+echo "  sudo journalctl -u acu-backend -f"
+echo "  sudo journalctl -u acu-daemon -f"

@@ -1,15 +1,15 @@
 #!/bin/bash
 set -e
 
-echo "Stopping Eureka services..."
+echo "Stopping ACU services..."
 
 # Stop services
-systemctl stop eureka-backend.service 2>/dev/null || true
-systemctl stop eureka-daemon.service 2>/dev/null || true
+systemctl stop acu-backend.service 2>/dev/null || true
+systemctl stop acu-daemon.service 2>/dev/null || true
 
 # Disable services
-systemctl disable eureka-backend.service 2>/dev/null || true
-systemctl disable eureka-daemon.service 2>/dev/null || true
+systemctl disable acu-backend.service 2>/dev/null || true
+systemctl disable acu-daemon.service 2>/dev/null || true
 
 echo "Services stopped."
 

@@ -1,17 +1,17 @@
 #!/bin/bash
 set -e
 
-BACKEND_USER=eureka
-INSTALL_DIR=/opt/eureka
+BACKEND_USER=acu
+INSTALL_DIR=/opt/acu
 
 case "$1" in
     remove)
-        echo "Removing Eureka package..."
+        echo "Removing ACU package..."
         systemctl daemon-reload
         ;;
 
     purge)
-        echo "Purging Eureka package (removing all data)..."
+        echo "Purging ACU package (removing all data)..."
 
         # Remove installation directory
         if [ -d "$INSTALL_DIR" ]; then
@@ -19,8 +19,8 @@ case "$1" in
         fi
 
         # Remove runtime directories
-        rm -rf /var/log/eureka
-        rm -rf /var/lib/eureka
+        rm -rf /var/log/acu
+        rm -rf /var/lib/acu
 
         # Remove service user
         if id "$BACKEND_USER" &>/dev/null; then

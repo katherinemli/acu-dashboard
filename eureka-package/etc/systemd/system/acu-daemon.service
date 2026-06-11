@@ -1,14 +1,14 @@
 [Unit]
-Description=Eureka ACU Supervisor Daemon
+Description=ACU Supervisor Daemon
 After=network.target
-Before=eureka-backend.service
+Before=acu-backend.service
 
 [Service]
 Type=simple
-User=eureka
-Group=eureka
-WorkingDirectory=/opt/eureka/acu-daemon
-ExecStart=/usr/bin/python3 acumon.py -d /var/lib/eureka -f
+User=acu
+Group=acu
+WorkingDirectory=/opt/acu/acu-daemon
+ExecStart=/usr/bin/python3 acumon.py -d /var/lib/acu -f
 Restart=on-failure
 RestartSec=3s
 
@@ -17,12 +17,12 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=yes
-ReadWritePaths=/var/lib/eureka /var/log/eureka
+ReadWritePaths=/var/lib/acu /var/log/acu
 
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=eureka-daemon
+SyslogIdentifier=acu-daemon
 
 [Install]
 WantedBy=multi-user.target

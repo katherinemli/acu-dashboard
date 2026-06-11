@@ -1,0 +1,32 @@
+[Unit]
+Description=ACU Backend (Flask API)
+After=network.target acu-daemon.service
+Wants=acu-daemon.service
+
+[Service]
+Type=simple
+User=acu
+Group=acu
+WorkingDirectory=/opt/acu/backend
+ExecStart=/opt/acu/venv/bin/python3 app.py
+Restart=on-failure
+RestartSec=5s
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/acu /var/log/acu
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=acu-backend
+
+# Environment
+Environment="RUNTIME_DIR=/var/lib/acu"
+Environment="FLASK_ENV=production"
+
+[Install]
+WantedBy=multi-user.target

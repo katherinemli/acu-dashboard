@@ -1,4 +1,4 @@
-Package: eureka-acu
+Package: acu
 Version: 1.0.0
 Section: admin
 Priority: optional
@@ -6,7 +6,7 @@ Architecture: amd64
 Maintainer: Katherine Liberona <katherine.lib.ira@gmail.com>
 Homepage: https://github.com/katherinelib/eurekadekatherine
 Depends: python3 (>= 3.8), python3-pip, python3-venv, systemd
-Description: Eureka ACU - Satellite Antenna Control System
+Description: ACU - Satellite Antenna Control System
  Full-stack embedded systems dashboard and daemon.
  Supervisor state machine for real-time antenna pointing control.
  Includes backend API (Flask) and web dashboard (Vue 3).

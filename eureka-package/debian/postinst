@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-PKG_NAME=eureka-acu
-INSTALL_DIR=/opt/eureka
+PKG_NAME=acu
+INSTALL_DIR=/opt/acu
 VENV_DIR=$INSTALL_DIR/venv
-BACKEND_USER=eureka
-BACKEND_GROUP=eureka
+BACKEND_USER=acu
+BACKEND_GROUP=acu
 
 echo "Installing $PKG_NAME..."
 
@@ -23,14 +23,14 @@ source $VENV_DIR/bin/activate
 pip install -q -r $INSTALL_DIR/backend/requirements.txt
 
 # Create log directory
-mkdir -p /var/log/eureka
-chown $BACKEND_USER:$BACKEND_GROUP /var/log/eureka
-chmod 755 /var/log/eureka
+mkdir -p /var/log/acu
+chown $BACKEND_USER:$BACKEND_GROUP /var/log/acu
+chmod 755 /var/log/acu
 
 # Create runtime directory
-mkdir -p /var/lib/eureka
-chown $BACKEND_USER:$BACKEND_GROUP /var/lib/eureka
-chmod 755 /var/lib/eureka
+mkdir -p /var/lib/acu
+chown $BACKEND_USER:$BACKEND_GROUP /var/lib/acu
+chmod 755 /var/lib/acu
 
 # Set permissions
 chown -R $BACKEND_USER:$BACKEND_GROUP $INSTALL_DIR
@@ -38,17 +38,17 @@ chmod 755 $INSTALL_DIR
 
 # Enable systemd services
 systemctl daemon-reload
-systemctl enable eureka-backend.service
-systemctl enable eureka-daemon.service
+systemctl enable acu-backend.service
+systemctl enable acu-daemon.service
 
 echo "$PKG_NAME installed successfully!"
 echo ""
 echo "Start services:"
-echo "  systemctl start eureka-daemon"
-echo "  systemctl start eureka-backend"
+echo "  systemctl start acu-daemon"
+echo "  systemctl start acu-backend"
 echo ""
 echo "View logs:"
-echo "  journalctl -u eureka-backend -f"
-echo "  journalctl -u eureka-daemon -f"
+echo "  journalctl -u acu-backend -f"
+echo "  journalctl -u acu-daemon -f"
 
 exit 0

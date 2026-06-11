@@ -1,6 +1,6 @@
-# Eureka ACU — DEB Packaging
+# ACU — DEB Packaging
 
-Production-ready Debian package for Eureka ACU daemon + backend.
+Production-ready Debian package for ACU daemon + backend.
 
 ## Building
 
@@ -9,12 +9,12 @@ cd eureka-package
 ./make_deb.sh
 ```
 
-Creates: `eureka-acu_1.0.0_amd64.deb`
+Creates: `acu_1.0.0_amd64.deb`
 
 ## Installation
 
 ```bash
-sudo dpkg -i eureka-acu_1.0.0_amd64.deb
+sudo dpkg -i acu_1.0.0_amd64.deb
 sudo apt-get install -f  # Fix any missing dependencies
 ```
 
@@ -22,38 +22,38 @@ sudo apt-get install -f  # Fix any missing dependencies
 
 ### Package Structure
 ```
-/opt/eureka/
+/opt/acu/
 ├── acu-daemon/          ← Supervisor daemon
 ├── backend/             ← Flask API
 ├── frontend/dist/       ← Vue 3 build (optional)
 └── venv/                ← Python virtual env (created at install)
 
 /etc/systemd/system/
-├── eureka-daemon.service
-└── eureka-backend.service
+├── acu-daemon.service
+└── acu-backend.service
 
-/var/lib/eureka/        ← Runtime data (state.json, etc.)
-/var/log/eureka/        ← Logs
+/var/lib/acu/           ← Runtime data (state.json, etc.)
+/var/log/acu/           ← Logs
 ```
 
 ### Services
 
 Start automatically on boot:
 ```bash
-sudo systemctl start eureka-daemon
-sudo systemctl start eureka-backend
+sudo systemctl start acu-daemon
+sudo systemctl start acu-backend
 ```
 
 View logs:
 ```bash
-sudo journalctl -u eureka-daemon -f
-sudo journalctl -u eureka-backend -f
+sudo journalctl -u acu-daemon -f
+sudo journalctl -u acu-backend -f
 ```
 
 ## Installation Scripts
 
 ### postinst (after installation)
-- Creates `eureka` service user
+- Creates `acu` service user
 - Sets up Python venv
 - Creates log/runtime directories
 - Enables systemd services
@@ -75,7 +75,7 @@ Systemd hardening:
 - `PrivateTmp=true`
 - `ProtectSystem=strict`
 - `ProtectHome=yes`
-- Runs as unprivileged `eureka` user
+- Runs as unprivileged `acu` user
 
 ## Dependencies
 
@@ -89,12 +89,12 @@ Checked automatically by `dpkg`:
 
 Remove package:
 ```bash
-sudo apt-get remove eureka-acu
+sudo apt-get remove acu
 ```
 
 Completely purge (removes all data):
 ```bash
-sudo apt-get purge eureka-acu
+sudo apt-get purge acu
 ```
 
 ---
