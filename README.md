@@ -1,199 +1,217 @@
-# Eureka ACU — Portfolio Demo
+# Eureka ACU — Portfolio Demo 🛰️
 
-This is Katherine's personal portfolio demonstrating her contributions to the **Eureka ACU** (Antenna Control Unit) project — a satellite communication system that runs on Raspberry Pi 5, pointing a flat-panel electronically steerable antenna (ESA) at satellites using GPS, IMU, and modem signals.
+Katherine's personal portfolio demonstrating full-stack embedded systems architecture: **Eureka ACU** is a satellite antenna control system running on Raspberry Pi 5. This demo showcases her contributions to the supervisor state machine, operational dashboards, and real-time telemetry processing.
+
+**⭐ Key Contributions:**
+- Supervisor state machine (operational authority)
+- Backend API & configuration management  
+- Vue 3 dashboard with real-time satellite tracking
+- Integration of GPS, IMU, and modem signals
+- Calibration pipeline design
 
 ## What's Included
 
-### Backend (Flask Python)
-- **RESTful API** (`routes/`): Status, telemetry, config management, satellite/TLE management, calibration, logs, actions, debug tools
-- **State management**: Supervisor mode tracking, runtime configuration, device health
-- **Database**: SQLite telemetry with sensor/antenna/satellite/pointing data
-- **File I/O abstraction**: Graceful parsing of ACU log files and sensor data
+### acu-daemon/ (Python)
+Simplified daemon demonstrating:
+- **Supervisor State Machine**: `INIT → IDLE → READY → AUTO_POINTING → TRACKING → FAULT`
+- **Pointing Control**: Smooth beam steering with target tracking
+- **Sensor Simulation**: Temperature, pressure, compass, GPS  
+- **Telemetry Logging**: Writes `.dat` files (`pointing.dat`, `sensors.dat`, `modem_stats.dat`)
+- **Configuration**: INI file parsing and hot-reload
 
-### Frontend (Vue 3 + Vite)
-- **Dashboard** (Overview): Real-time antenna azimuth/elevation, satellite signal, modem lock status, supervisor state
-- **Telemetry viewer**: Temperature, pressure, compass (magnetometer), GPS, modem statistics
-- **Configuration UI**: Edit INI config files with UI fallbacks
-- **Satellite & TLE management**: Upload, activate, manage orbital data
-- **Tools panel**: Reboot, firmware upgrade, event logs, CLI console
-- **Calibration UI**: Magnetometer calibration flow (read-only in demo)
-- **Docs**: In-app manual with screenshots
+### emulators/ (Python)
+Hardware simulators so the system works standalone:
+- **modem_sim.py**: GPS receiver → NMEA RMC sentences on port 10001
+- **esa_sim.py**: Antenna controller → AMIP protocol on port 5005
 
-### ACU Emulator (Python)
-- **No hardware or C code** — pure Python simulation
-- **Supervisor state machine**: IDLE → READY → AUTO_POINTING → TRACKING (demo cycle every 50s)
-- **Synthetic sensor data**: Realistic oscillating azimuth/elevation, temperature, pressure, compass readings
-- **All required log files**: `ubx_rmc.dat`, `modem_stats.dat`, `sensors.dat`, `pointing.dat`, etc.
-- **SQLite telemetry DB**: Same schema as the real hardware
+### backend/ (Flask)
+RESTful API + database:
+- **Status & telemetry**: Real-time dashboard data
+- **Configuration**: Read/write INI files
+- **Logs**: Stream ACU messages and sensor data  
+- **Actions**: Manual pointing commands
+- **Database**: SQLite (same schema as production)
 
-## Getting Started
+### frontend/ (Vue 3 + Vite)
+Operational dashboard:
+- **Map**: Leaflet satellite tracking visualization
+- **Telemetry**: Real-time sensor graphs
+- **Status**: Supervisor state, modem/antenna health
+- **Config**: Edit system parameters
+- **Logs**: Live message browser
+- **Manual Control**: Azimuth/elevation nudge commands
+
+## Quick Start
 
 ### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- macOS, Linux, or Windows (WSL)
+```bash
+python3 --version  # 3.8+
+node --version     # 16+
+```
 
-### Quick Start
+### Run Everything (One Command!)
 
 ```bash
 cd ~/eurekadekatherine
-./demo/run_demo.sh
+./run-demo.sh
 ```
 
-This script will:
-1. Create `demo/runtime/` with fake config and runtime data
-2. Initialize the telemetry database
-3. Start the ACU emulator (writes fake sensor logs)
-4. Start the Flask backend on `http://localhost:5000`
-5. Start the Vue dev server on `http://localhost:5173`
+This starts:
+1. Modem simulator (GPS, port 10001)
+2. ESA simulator (antenna, port 5005)
+3. ACU daemon (pointing control, logs)
+4. Flask backend (port 5000)
+5. Vue dev server (port 5173)
 
-Open your browser to `http://localhost:5173` and explore the dashboard.
+Open **http://localhost:5173** and watch the system run through a demo cycle (~10 seconds).
 
-**Stop with Ctrl+C** in the terminal.
+**Stop with Ctrl+C**
 
-## Portfolio Highlights
+## Architecture Highlights
 
-### Backend Design
-- **Modular blueprint architecture**: Separation of concerns (status, telemetry, config, calibration, actions, etc.)
-- **Safe file parsing**: Regex-based parsers for NMEA GPS, modem stats, magnetometer sensor data
-- **Calibration tracking**: Non-invasive observability around frozen calibration math
-- **Configuration hot-reload**: Monitor and manage INI files with schema fallbacks
+### Supervisor State Machine (acumon.py)
+**Design**: Centralized operational authority with guarded state transitions.
 
-### Frontend Design
-- **Reactive state management**: Pinia store for ACU state, real-time updates
-- **Component composition**: Reusable panels, modals, data visualizers
-- **Progressive disclosure**: Tools panel contains calibration, logs, CLI, and system actions
-- **Responsive layout**: Works on mobile (iPad/tablet) and desktop
-
-### System Architecture
-The **supervisor state machine** is the runtime authority:
 ```
-[IDLE] 
-  ↓ (calibrated + commanded)
-[READY] 
-  ↓ (satellite in view)
-[AUTO_POINTING] 
-  ↓ (locked onto signal)
-[TRACKING]
-```
-
-The backend/frontend are **support layers only** — they query and display state, send commands via CLI, but do not invent operational decisions. This separation was a key architectural goal.
-
-## Demo Features
-
-### Supervisor Cycling
-The emulator cycles through all 4 supervisor states automatically (every 50 seconds) so you can see state transitions in the dashboard.
-
-### Realistic Telemetry
-- Antenna azimuth/elevation oscillate smoothly (satellite tracking simulation)
-- Temperature/pressure vary within expected ranges
-- Compass (magnetometer) generates realistic 3-axis vectors
-- Modem occasionally drops lock (2% chance per cycle) to test error handling
-
-### Config Management
-The `/api/config` routes let you upload, backup, and restore INI files. In demo mode, edits are written to `demo/runtime/etc/acu/config.ini`.
-
-### Log Viewer
-All emulator outputs go to `demo/runtime/var/log/acu/`, and the frontend reads them in real-time for the Logs tab.
-
-## Architecture Notes
-
-### No Hardware Mode
-Because the personal portfolio lacks a Raspberry Pi, the **acumon daemon is emulated in Python**:
-- All C sensor drivers (ICM20948 IMU, BMP5 barometer, u-blox GPS) are replaced with synthetic data
-- The supervisor state machine logic is ported to Python for demonstration
-- Pointing math (antenna beam steering) is simulated with smooth sinusoidal movement
-
-The emulator is sufficient to **demonstrate the frontend/backend correctly** and show the supervisor architecture without access to real hardware.
-
-### Separation of Contributions
-This portfolio includes:
-- ✅ **Katherine**: All backend routes, frontend components, supervisor design
-- ✅ **Fake acumon**: Pure Python emulation, no C code
-- ❌ **Xiaming's code**: Real C sensor drivers (ICM20948, BMP5, u-blox)
-- ❌ **Pablo's code**: Real pointing math (beam steering, TLE propagation, magnetic declination)
-
-## Development
-
-### Backend
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-export DEMO_DATA_DIR=../demo/runtime
-python3 app.py
+┌─────┐
+│INIT │
+└──┬──┘
+   ↓ (hw initialized)
+┌─────┐  
+│IDLE │ ← return point
+└──┬──┘  
+   ↓ (hw ok + calibrated)
+┌───────┐
+│READY  │
+└──┬────┘
+   ↓ (satellite in range)
+┌──────────────┐
+│AUTO_POINTING │
+└──┬───────────┘
+   ↓ (signal locked)
+┌─────────┐
+│TRACKING │
+└─────────┘
 ```
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev    # dev server with HMR
-npm run build  # production build to dist/
-```
+Each transition is guarded:
+- `READY`: requires modem_ok, esa_ok, calibrated
+- `AUTO_POINTING`: valid from READY or TRACKING
+- `TRACKING`: valid from AUTO_POINTING
+- `FAULT`: reachable from any state
 
-### Emulator
-```bash
-export DEMO_DATA_DIR=demo/runtime
-python3 demo/acumon_emulator.py
-```
+### Backend (Flask Routes)
+- `/api/status` — supervisor state, pointing (az/el), hardware health
+- `/api/telemetry` — real-time sensor data (temp, pressure, compass, GPS)
+- `/api/logs` — stream ACU messages and errors
+- `/api/actions/manual-*` — pointing control commands
+
+### Frontend (Vue Components)
+- **StatusPanel**: Supervisor state visual indicator
+- **MapView**: Leaflet satellite position + beam vector
+- **TelemetryChart**: Real-time sensor graphs
+- **LogViewer**: Scrolling message stream
+
+## Demo Behavior
+
+The daemon auto-cycles through states (~1 cycle per 10 seconds):
+1. **Boot** (INIT) — load config, init hardware
+2. **Ready** (IDLE → READY) — modem + antenna online
+3. **Scan** (AUTO_POINTING) — search for satellite
+4. **Lock** (TRACKING) — smooth beam tracking
+5. **Stop** (→ IDLE) — manual shutdown command
+
+Antenna position, sensor values, and logs update live in the dashboard.
 
 ## File Structure
 
 ```
 eurekadekatherine/
-├── backend/              ← Flask app, routes, database schema
-├── frontend/             ← Vue 3 components, stores, router
-├── demo/
-│   ├── acumon_emulator.py    ← Supervisor emulator (no hardware)
-│   ├── run_demo.sh           ← One-liner to start everything
-│   ├── fake_data/
-│   │   ├── config.ini        ← Sample INI (Paris location)
-│   │   ├── satellites.ini    ← Sample satellites (SES-14, ASTRA, etc.)
-│   │   └── sensors_cal.json  ← Fake but valid calibration
-│   └── runtime/              ← Generated at startup (logs, DB, etc.)
+├── run-demo.sh              ← Start everything with one command
+├── acu-daemon/
+│   └── acumon.py            ← Supervisor state machine + pointing control
+├── emulators/
+│   ├── modem_sim.py         ← GPS/NMEA simulator (port 10001)
+│   └── esa_sim.py           ← Antenna AMIP simulator (port 5005)
+├── backend/
+│   ├── app.py               ← Flask entry + blueprint registration
+│   ├── routes/              ← API endpoints (status, telemetry, config, actions)
+│   ├── models/              ← Database schema + state management
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── App.vue          ← Root layout
+│   │   ├── components/      ← Dashboard panels (Map, Status, Telemetry, etc.)
+│   │   └── router/
+│   ├── vite.config.js
+│   └── package.json
+├── sample-data/             ← Example config, .dat files (future)
 └── README.md
 ```
 
-## Testing the Demo
+## Manual Development
 
-### Pages to Explore
-1. **Overview** — Real-time antenna position, signal, supervisor state
-2. **Stats** — Telemetry: temperature, pressure, compass, modem
-3. **Config** — Edit config.ini via UI
-4. **Satellites** — Manage satellites (demo data: SES-14, ASTRA, INTELSAT)
-5. **Logs** — View all ACU messages and sensor data in real-time
-6. **Tools** → Calibration — Browse calibration history (read-only in demo)
-7. **Tools** → CLI Console — Send manual commands to acumon
+### Start daemon only
+```bash
+cd acu-daemon
+python3 acumon.py -d /tmp/eureka -f
+```
 
-### Expected Behavior
-- Antenna azimuth/elevation oscillate between realistic ranges
-- Every 50 seconds, supervisor state advances (IDLE → READY → AUTO_POINTING → TRACKING)
-- Temperature/pressure wiggle naturally around ~27°C / 100.5 kPa
-- Modem occasionally shows "no lock" (transient loss)
-- Compass heading rotates smoothly as the system "points" at the satellite
+### Start backend
+```bash
+cd backend
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+export RUNTIME_DIR=/tmp/eureka
+python3 app.py  # http://localhost:5000
+```
 
-## Known Limitations (Demo Mode)
+### Start frontend
+```bash
+cd frontend
+npm install
+npm run dev     # http://localhost:5173
+```
 
-1. **No real hardware**: Sensor values are synthetic, not from actual IMU/GPS/modem
-2. **No actual antenna**: Azimuth/elevation are fake; no real RF lock achieved
-3. **No TLE propagation**: Satellite positions don't calculate from real orbital data
-4. **Read-only calibration UI**: Calibration history is displayed but cannot be run
-5. **Static location**: GPS is hardcoded to Paris for simplicity
+### Start individual emulators
+```bash
+python3 emulators/modem_sim.py   # port 10001
+python3 emulators/esa_sim.py     # port 5005
+```
 
-These are intentional trade-offs for a portfolio demo on a personal machine without Raspberry Pi hardware.
+## Design Notes
 
-## License & Attribution
+### Why Python for acumon?
+The production system runs C on Raspberry Pi. For the portfolio demo, Python was chosen to:
+- **Show architecture** without hardware constraints
+- **Keep it simple** — focus on supervisor logic, not driver details
+- **Match the stack** with backend/frontend for cohesion
+- **Easier to modify** for interview discussions
 
-**Eureka ACU** is a collaborative project. This portfolio includes Katherine's architectural and code contributions to demonstrate her expertise in:
-- Full-stack web development (Flask + Vue 3)
-- System state machine design
-- Embedded systems support software
-- Real-time telemetry visualization
+### Supervisor Authority
+The daemon is the sole authority for:
+- Mode transitions (IDLE ↔ READY ↔ AUTO_POINTING ↔ TRACKING)
+- Pointing control (beam steering, safety limits)
+- Operational state
+
+Backend and frontend are **read-only consumers** — they observe state via REST APIs and send commands, but never invent decisions. This design was critical in the production migration.
+
+### Integration Points
+1. **Daemon ↔ Backend**: Filesystem polling (`/tmp/eureka/var/log/acu/*.dat`)
+2. **Backend ↔ Frontend**: REST + WebSocket (planned)
+3. **Emulators ↔ Daemon**: TCP sockets (modem on 10001, antenna on 5005)
+
+## Known Limitations
+
+- **No real GPS**: Uses synthetic Paris location
+- **No real antenna**: Pointing is simulated smooth oscillation
+- **No calibration**: Sensor calibration math is frozen (read-only)
+- **Single-user**: No authentication (demo only)
 
 ---
 
-**Questions or feedback?** Open an issue or reach out.
+**Katherine Liberona Irarrazabal** — katherine.lib.ira@gmail.com  
+Portfolio: Full-stack embedded systems, real-time state machines, satellite communications  
+[GitHub](https://github.com) | [LinkedIn](https://linkedin.com)
 
-Happy exploring! 🚀
+🛰️ Happy exploring!
