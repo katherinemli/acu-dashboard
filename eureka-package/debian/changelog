@@ -1,0 +1,8 @@
+eureka-acu (1.0.0) stable; urgency=medium
+
+  * Initial portfolio release
+  * Supervisor state machine (IDLE -> READY -> AUTO_POINTING -> TRACKING)
+  * Flask REST API + Vue 3 dashboard
+  * Systemd integration for backend + daemon
+
+ -- Katherine Liberona <katherine.lib.ira@gmail.com>  Wed, 11 Jun 2026 10:00:00 +0000

@@ -42,11 +42,16 @@ Daemon cycles through: `IDLE → READY → AUTO_POINTING → TRACKING` (repeats 
 ## File Structure
 ```
 eurekadekatherine/
-├── acu-daemon/acumon.py     ← Supervisor (writes state.json)
-├── backend/                  ← Flask API (reads state.json)
+├── acu-daemon/               ← Python supervisor daemon
+├── backend/                  ← Flask API
 ├── frontend/                 ← Vue 3 dashboard
-├── sample-data/              ← Example configs
-└── run-demo.sh              ← Start everything
+├── eureka-package/          ← DEB packaging (production)
+│   ├── debian/              ← Debian metadata (control, changelog, etc.)
+│   ├── etc/systemd/system/  ← Systemd service files
+│   ├── make_deb.sh          ← Build DEB package
+│   └── PACKAGING.md         ← Packaging documentation
+├── sample-data/             ← Example configs
+└── run-demo.sh              ← Local demo (development)
 ```
 
 ## How It Works
@@ -81,44 +86,73 @@ Polls backend every second, renders:
 
 ## Development
 
-### Daemon only
+### Local Demo (all 3 services)
 ```bash
+./run-demo.sh
+# Opens: http://localhost:5173
+```
+
+### Individual Services
+```bash
+# Daemon only
 cd acu-daemon && python3 acumon.py -d /tmp/eureka -f
-```
 
-### Backend only
-```bash
-cd backend
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-export RUNTIME_DIR=/tmp/eureka
-python3 app.py
-```
+# Backend only
+cd backend && python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt && RUNTIME_DIR=/tmp/eureka python3 app.py
 
-### Frontend only
-```bash
+# Frontend only
 cd frontend && npm install && npm run dev
 ```
 
+## Production Packaging
+
+### Build DEB
+```bash
+cd eureka-package
+./make_deb.sh
+# Creates: eureka-acu_1.0.0_amd64.deb
+```
+
+### Install on Debian/Ubuntu
+```bash
+sudo dpkg -i eureka-acu_1.0.0_amd64.deb
+sudo systemctl start eureka-daemon eureka-backend
+```
+
+**What the DEB provides:**
+- ✅ Systemd services (auto-start, logging, restart on failure)
+- ✅ Unprivileged `eureka` service user
+- ✅ Secure systemd hardening (PrivateTmp, ProtectSystem, etc.)
+- ✅ Python venv auto-setup (postinst)
+- ✅ Log rotation integration
+- ✅ Service lifecycle (prerm, postrm hooks)
+- ✅ Standard Debian compliance
+
+See `eureka-package/PACKAGING.md` for details.
+
 ## Key Design Decisions
 
-1. **Single source of truth**: Daemon writes JSON, backend reads JSON → no sync issues
-2. **No emulators**: Real behavior lives in the daemon, not fake hardware sims
-3. **REST-first**: Frontend-agnostic API (works with any frontend framework)
-4. **Stateless backend**: Reads from file, no in-process state
-5. **Production patterns**: This architecture mirrors the real Eureka ACU system
+1. **Single source of truth**: Daemon writes JSON, backend reads JSON
+2. **No complex emulators**: Real behavior in daemon, not fake hardware
+3. **REST-first**: Frontend-agnostic API
+4. **Systemd-native**: Standard Linux service management
+5. **Security hardened**: Unprivileged user, ProtectSystem, etc.
+6. **Production ready**: Real DEB package, not a toy
 
 ## Tech Stack
 
-| Layer | Tech |
-|-------|------|
+| Component | Tech |
+|-----------|------|
 | Daemon | Python 3 (stdlib only) |
-| Backend | Flask, SQLite |
-| Frontend | Vue 3, Vite, Leaflet |
-| Data | JSON + SQLite |
+| Backend | Flask + SQLite |
+| Frontend | Vue 3 + Vite + Leaflet |
+| Services | Systemd units |
+| Packaging | Debian (.deb) |
 
 ---
 
-**Katherine Liberona Irarrazabal** · katherine.lib.ira@gmail.com
+**Katherine Liberona Irarrazabal** · katherine.lib.ira@gmail.com  
+Portfolio: Full-stack embedded systems · Real-time state machines · Production packaging
 
 🛰️

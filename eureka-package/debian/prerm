@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+echo "Stopping Eureka services..."
+
+# Stop services
+systemctl stop eureka-backend.service 2>/dev/null || true
+systemctl stop eureka-daemon.service 2>/dev/null || true
+
+# Disable services
+systemctl disable eureka-backend.service 2>/dev/null || true
+systemctl disable eureka-daemon.service 2>/dev/null || true
+
+echo "Services stopped."
+
+exit 0
